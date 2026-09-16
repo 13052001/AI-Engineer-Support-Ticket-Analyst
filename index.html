@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support Ticket AI Analyst</title>
+<style>
+body{font-family:system-ui;margin:0;background:#f5f7fb;color:#172033}
+main{max-width:1000px;margin:40px auto;padding:0 20px}
+.card{background:white;border-radius:14px;padding:22px;margin:16px 0;box-shadow:0 2px 12px #00000012}
+textarea{width:100%;min-height:90px;padding:12px;box-sizing:border-box;border:1px solid #ccd3df;border-radius:10px}
+button{margin-top:12px;padding:10px 16px;border:0;border-radius:9px;cursor:pointer}
+pre{white-space:pre-wrap;overflow:auto;background:#111827;color:#e5e7eb;padding:16px;border-radius:10px}
+.examples button{margin:4px 4px 4px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Support Ticket AI Analyst</h1>
+<p>Ask questions about the 500-ticket support dataset using natural language.</p>
+<div class="card">
+<textarea id="q" placeholder="e.g. Which agent has the lowest average customer rating?"></textarea>
+<button onclick="ask()">Ask AI</button>
+<div class="examples">
+<button onclick="fill('How many tickets are currently open?')">Open tickets</button>
+<button onclick="fill('Which agent has the lowest average customer rating?')">Lowest rating</button>
+<button onclick="fill('How many Critical tickets are unresolved?')">Critical unresolved</button>
+<button onclick="fill('What is the average customer rating for Technical category tickets?')">Technical rating</button>
+</div>
+</div>
+<div class="card">
+<h2>Answer</h2><pre id="out">No query yet.</pre>
+</div>
+<div class="card">
+<h2>Anomalies</h2><button onclick="anomalies()">Detect anomalies</button><pre id="anom">Click to run.</pre>
+</div>
+</main>
+<script>
+function fill(x){document.getElementById('q').value=x}
+async function ask(){
+ const q=document.getElementById('q').value;
+ const out=document.getElementById('out'); out.textContent='Thinking...';
+ try{let r=await fetch('/query',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})});
+ let j=await r.json(); out.textContent=r.ok?JSON.stringify(j,null,2):'Error: '+JSON.stringify(j);
+ }catch(e){out.textContent=e.toString()}
+}
+async function anomalies(){
+ const out=document.getElementById('anom'); out.textContent='Detecting...';
+ let r=await fetch('/anomalies'); let j=await r.json(); out.textContent=JSON.stringify(j,null,2);
+}
+</script>
+</body>
+</html>
